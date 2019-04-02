@@ -1,61 +1,423 @@
-<!-- This Source Code Form is subject to the terms of the Mozilla Public
-   - License, v. 2.0. If a copy of the MPL was not distributed with this
-   - file, You can obtain one at http://mozilla.org/MPL/2.0/.  
-	 
-	 - Copyright (C) 2012 Prince Samuel <prince.samuel@gmail.com>  -->
+<!doctype html>
+<html lang="en">
+<head>
 
-<html>
-  <head>
-    <title>Open Hardware Monitor - Web Version</title>
-    <script type='text/javascript' src='js/jquery-1.7.2.min.js'></script>
-    <script type='text/javascript' src='js/jquery.tmpl.min.js'></script>
-    <script type='text/javascript' src='js/knockout-2.1.0.min.js'></script>
-    <script type='text/javascript' src='js/knockout.mapping-latest.min.js'></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>HardwareMon</title>
 
-    <link href="css/jquery.treeTable.css" rel="stylesheet" type="text/css" />
-    <script type='text/javascript' src='js/jquery.treeTable.min.js'></script>
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
-    <link href="css/custom-theme/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css" />
-    <link href="css/ohm_web.css" rel="stylesheet" type="text/css" />
-    <script type='text/javascript' src='js/jquery-ui-1.8.16.custom.min.js'></script>
     <style>
-      #toolbar {
-        padding: 10px 10px;
-      }
-      #slider {
-        display: inline-block;
-        width: 100px;
-      }
+
+        body {
+            height: 100%;
+            background-color: #111111;
+            color: #CCC;
+        }
     </style>
 
+</head>
 
-    <script type='text/javascript' src='js/ohm_web.js'></script>
+<body class="text-center">
 
-  </head>
+    <div class="cover-container d-flex w-100 h-100 p-1 mx-auto flex-column">
 
-  <body>
+        <!--CPU Row-->
+        <div class="row no-gutters">
 
-    <div class="header">
+            <div class="col p-1">
 
-      <span id="toolbar" class="ui-widget-header ui-corner-all">
-        <button id="refresh" data-bind="click: update">Refresh</button>
-        <input type="checkbox" id="auto_refresh" data-bind="checked: auto_refresh"/><label for="auto_refresh">Auto Refresh</label>
-        &nbsp;<div id="slider"></div>&nbsp;&nbsp;&nbsp;&nbsp;<span for="auto_refresh" id="lbl"></span>
-      </span>
+                <!--CPU Temp-->
+                <h4 class="p-0 m-0">CPU Temp (&#8451;)</h4>
+                <div id="ContainerCPUTemp" style="height: 280px"></div>
+
+            </div>
+
+            <div class="col p-1">
+
+                <!--CPU Load-->
+                <h4 class="p-0 m-0">CPU Load (%)</h4>
+                <div id="ContainerCPULoad" style="height: 280px"></div>
+
+            </div>
+
+        </div>
+
+        <!--GPU Row-->
+        <div class="row no-gutters">
+
+            <div class="col p-1">
+
+                <!--GPU Temp-->
+                <h4 class="p-0 m-0">GPU Temp (&#8451;)</h4>
+                <div id="ContainerGPUTemp" style="height: 280px"></div>
+
+            </div>
+
+            <div class="col p-1">
+
+                <!--GPU Load-->
+                <h4 class="p-0 m-0">GPU Load (%)</h4>
+                <div id="ContainerGPULoad" style="height: 280px"></div>
+
+            </div>
+
+        </div>
+
+        <!--RAM & HDD Load Row-->
+        <div class="row no-gutters">
+
+            <div class="col p-1">
+
+                <!--RAM Load-->
+                <h4 class="p-0 m-0">RAM Usage (%)</h4>
+                <div id="ContainerRAMLoad" style="height: 280px"></div>
+
+            </div>
+
+            <div class="col p-1">
+
+                <!--HDD Load-->
+                <h4 class="p-0 m-0">HDD Usage (%)</h4>
+                <div id="ContainerHDDLoad" style="height: 280px"></div>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <div class="main">
-      <table data-bind="treeTable: flattened, treeOptions: { initialState: 'expanded', clickableNodeNames: true } ">
-        <thead><td>Sensor</td><td>Min</td><td>Value</td><td>Max</td>
-          <tbody data-bind="foreach: flattened">
-            <tr data-bind="attr: { 'id': 'node-' + id(), 'class': parent.id()?'child-of-node-' + parent.id():'' }">
-              <td data-bind="html: '<img src=' + ImageURL() + ' />&nbsp; ' + Text()"></td>
-              <td data-bind="text: Min"></td>
-              <td data-bind="text: Value"></td>
-              <td data-bind="text: Max"></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </body>
-  </html>
+    <!--Bootstrap/Jquery JS Files from CDN-->
+    <!--JQuery must be loaded first-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <!--Highcharts JS from CDN-->
+    <script src="https://code.highcharts.com/highcharts.src.js"></script>
+    <script src="http://code.highcharts.com/highcharts-more.js"></script>
+    <script src="http://code.highcharts.com/modules/solid-gauge.js"></script>
+
+    <script type="text/javascript">
+
+        $(function () {
+
+            var gaugeOptions = {
+
+                chart: {
+                    type: 'solidgauge',
+                    backgroundColor: '#111111',
+                    spacing: [5, 5, 5, 5]
+                },
+
+                title: null,
+
+                pane: {
+                    center: ['50%', '50%'],
+                    size: '100%',
+                    startAngle: 0,
+                    endAngle: 360,
+                    background: {
+                        backgroundColor: '#222222',
+                        innerRadius: '60%',
+                        outerRadius: '100%',
+                        shape: 'arc',
+                        borderWidth: 0
+                    }
+                },
+
+                tooltip: {
+                    enabled: false
+                },
+
+                // the value axis
+                yAxis: {
+                    stops: [
+                        [0.1, '#00554F'], // green
+                        [0.5, '#00B2A7'], // yellow
+                        [0.9, '#00FFEF'] // red
+                    ],
+                    lineWidth: 0,
+                    minorTickInterval: null,
+                    tickPixelInterval: 400,
+                    tickWidth: 0,
+                    labels: {
+                        enabled: false
+                    }
+                },
+
+                plotOptions: {
+                    solidgauge: {
+                        dataLabels: {
+                            y: -35,
+                            borderWidth: 0,
+                            useHTML: true
+                        }
+                    }
+                }
+            };
+
+            // CPU Temp Gauge
+            var ChartCPUTemp = Highcharts.chart('ContainerCPUTemp', Highcharts.merge(gaugeOptions, {
+                yAxis: {
+                    min: 0,
+                    max: 100
+                },
+
+                credits: {
+                    enabled: false
+                },
+
+                series: [{
+                    name: 'CPUTemp',
+                    data: [0],
+                    dataLabels: {
+                        format: '<div style="text-align:center"><span style="font-size:60px;color:#CCCCCC;font-family:helvetica;font-weight:300">{y}</span><br/></div>'
+                    }
+                }]
+
+            }));
+
+            // CPU Load Gauge
+            var ChartCPULoad = Highcharts.chart('ContainerCPULoad', Highcharts.merge(gaugeOptions, {
+                yAxis: {
+                    min: 0,
+                    max: 100
+                },
+
+                credits: {
+                    enabled: false
+                },
+
+                series: [{
+                    name: 'CPULoad',
+                    data: [0],
+                    dataLabels: {
+                        format: '<div style="text-align:center"><span style="font-size:60px;color:#CCCCCC;font-family:helvetica;font-weight:300">{y}</span><br/></div>'
+                    }
+                }]
+
+            }));
+
+            // GPU Temp Gauge
+            var ChartGPUTemp = Highcharts.chart('ContainerGPUTemp', Highcharts.merge(gaugeOptions, {
+                yAxis: {
+                    min: 0,
+                    max: 100
+                },
+
+                credits: {
+                    enabled: false
+                },
+
+                series: [{
+                    name: 'GPUTemp',
+                    data: [0],
+                    dataLabels: {
+                        format: '<div style="text-align:center"><span style="font-size:60px;color:#CCCCCC;font-family:helvetica;font-weight:300">{y}</span><br/></div>'
+                    }
+                }]
+
+            }));
+
+            // GPU Load Gauge
+            var ChartGPULoad = Highcharts.chart('ContainerGPULoad', Highcharts.merge(gaugeOptions, {
+                yAxis: {
+                    min: 0,
+                    max: 100
+                },
+
+                credits: {
+                    enabled: false
+                },
+
+                series: [{
+                    name: 'GPULoad',
+                    data: [0],
+                    dataLabels: {
+                        format: '<div style="text-align:center"><span style="font-size:60px;color:#CCCCCC;font-family:helvetica;font-weight:300">{y}</span><br/></div>'
+                    }
+                }]
+
+            }));
+
+            // RAM Load Gauge
+            var ChartRAMLoad = Highcharts.chart('ContainerRAMLoad', Highcharts.merge(gaugeOptions, {
+                yAxis: {
+                    min: 0,
+                    max: 100
+                },
+
+                credits: {
+                    enabled: false
+                },
+
+                series: [{
+                    name: 'RAMLoad',
+                    data: [0],
+                    dataLabels: {
+                        format: '<div style="text-align:center"><span style="font-size:60px;color:#CCCCCC;font-family:helvetica;font-weight:300">{y}</span><br/></div>'
+                    }
+                }]
+
+            }));
+
+            // HDD Load Gauge
+            var ChartHDDLoad = Highcharts.chart('ContainerHDDLoad', Highcharts.merge(gaugeOptions, {
+                yAxis: {
+                    min: 0,
+                    max: 100
+                },
+
+                credits: {
+                    enabled: false
+                },
+
+                series: [{
+                    name: 'HDDLoad',
+                    data: [0],
+                    dataLabels: {
+                        format: '<div style="text-align:center"><span style="font-size:60px;color:#CCCCCC;font-family:helvetica;font-weight:300">{y}</span><br/></div>'
+                    }
+                }]
+
+            }));
+
+            // Bring life to the dials refresh every 1000 msec
+            setInterval(function () {
+                $.getJSON('data.json', function (data) {
+
+                    var Computer = data.Children[0]; // Get master Computer object
+                    var ComputerChildren = Computer.Children; // Get child objects of Computer
+
+                    //////////// CPU Temp & Load ////////////
+
+                    var CPU = ComputerChildren[1]; // Get CPU object
+                    var CPUChildren = CPU.Children; // Get child objects of CPU
+
+                    var CPUTemps = CPUChildren[1];
+                    var CPULoad = CPUChildren[2];
+
+                    // Core Temp calcs
+                    var CPUTotal = 0;
+                    var CPUCores = 0;
+                    var CPUTempVal = 0;
+
+                    // Append values if CPU Core is detected
+                    $.each(CPUTemps.Children, function (key, value) {
+                        if (value.Text.indexOf("CPU Core") >= 0) {
+                            CPUTotal += parseInt(value.Value.split(' ')[0]); // Splits string to get number value on Temp
+                            CPUCores++
+                        }
+                    });
+
+                    CPUTempVal = CPUTotal / CPUCores; // Divide total Temp by Core count
+
+                    // Core Load calcs
+                    var CPULoadVal = 0;
+
+                    // Find value based on 'CPU Total' Counter
+                    $.each(CPULoad.Children, function (key, value) {
+                        if (value.Text.indexOf("CPU Total") >= 0) {
+                            CPULoadVal = value.Value.split(' ')[0];
+                        }
+                    });
+
+                    //////////// GPU Temp & Load ////////////
+
+                    var GPU = ComputerChildren[3]; // Get GPU object
+                    var GPUChildren = GPU.Children; // Get child objects of GPU
+
+                    var GPUTemps = GPUChildren[1];
+                    var GPULoad = GPUChildren[2];
+
+                    // Core Temp calcs
+                    var GPUTempVal = 0;
+
+                    // Append values if GPU Core is detected
+                    $.each(GPUTemps.Children, function (key, value) {
+                        if (value.Text.indexOf("GPU Core") >= 0) {
+                            GPUTempVal = value.Value.split(' ')[0];
+                        }
+                    });
+
+                    // Core Load calcs
+                    var GPULoadVal = 0;
+
+                    // Append values if GPU Core is detected
+                    $.each(GPULoad.Children, function (key, value) {
+                        if (value.Text.indexOf("GPU Core") >= 0) {
+                            GPULoadVal = value.Value.split(' ')[0];
+                        }
+                    });
+
+                    //////////// RAM Load ////////////
+
+                    var RAM = ComputerChildren[2]; // Get GPU object
+                    var RAMChildren = RAM.Children; // Get child objects of GPU
+
+                    // RAM Load calcs
+                    var RAMLoad = RAMChildren[0];
+                    var RAMLoadVal = 0;
+
+                    // Append values if GPU Core is detected
+                    $.each(RAMLoad.Children, function (key, value) {
+                        if (value.Text.indexOf("Memory") >= 0) {
+                            RAMLoadVal = value.Value.split(' ')[0];
+                        }
+                    });
+
+                    //////////// HDD Load ////////////
+
+                    var HDD = ComputerChildren[4]; // Get GPU object
+                    var HDDChildren = HDD.Children; // Get child objects of GPU
+
+                    // HDD Load calcs
+                    var HDDLoad = HDDChildren[0];
+                    var HDDLoadVal = 0;
+
+                    // Append values if GPU Core is detected
+                    $.each(HDDLoad.Children, function (key, value) {
+                        if (value.Text.indexOf("Used Space") >= 0) {
+                            HDDLoadVal = value.Value.split(' ')[0];
+                        }
+                    });
+
+                    //////////// Update Charts ////////////
+
+                    // CPU Temp update
+                    var point = ChartCPUTemp.series[0].points[0];
+                    point.update(Math.round(CPUTempVal));
+
+                    // CPU Load update
+                    var point = ChartCPULoad.series[0].points[0];
+                    point.update(Math.round(CPULoadVal));
+
+                    // GPU Temp update
+                    var point = ChartGPUTemp.series[0].points[0];
+                    point.update(Math.round(GPUTempVal));
+
+                    // GPU Load update
+                    var point = ChartGPULoad.series[0].points[0];
+                    point.update(Math.round(GPULoadVal));
+
+                    // RAM Load update
+                    var point = ChartRAMLoad.series[0].points[0];
+                    point.update(Math.round(RAMLoadVal));
+
+                    // HDD Load update
+                    var point = ChartHDDLoad.series[0].points[0];
+                    point.update(Math.round(HDDLoadVal));
+
+                });
+            }, 1000);
+
+        });
+
+    </script>
+
+</body>
+
+</html>
